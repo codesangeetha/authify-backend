@@ -53,7 +53,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
         }
 
         const countQuery = `SELECT COUNT(*) FROM users ${whereClause}`;
-        const usersQuery = `SELECT id, username, email FROM users ${whereClause} ORDER BY id LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
+        const usersQuery = `SELECT id, username, email FROM users ${whereClause} ORDER BY id DESC LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
 
         const countResult = await pool.query(countQuery, values);
         const totalUsers = parseInt(countResult.rows[0].count);

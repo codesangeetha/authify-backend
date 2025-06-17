@@ -13,6 +13,7 @@ export const register = async (req: Request, res: Response) => {
     const user = await createUser(username, email, hashedPassword);
     res.status(201).json({ message: "User registered successfully", user });
   } catch (err) {
+    console.log("something",err);
     res.status(500).json({ error: "Something went wrong", details: err });
   }
 };
