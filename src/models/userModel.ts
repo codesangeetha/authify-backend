@@ -48,3 +48,7 @@ export const updateUserProfileImage = async (id: string, filename: string) => {
 export const deleteUserModel = async (id: string) => {
   await pool.query("DELETE FROM users WHERE id = $1", [id]);
 };
+
+export const updateUserPasswordById = async (userId: string, hashedPassword: string) => {
+  await pool.query("UPDATE users SET password = $1 WHERE id = $2", [hashedPassword, userId]);
+};

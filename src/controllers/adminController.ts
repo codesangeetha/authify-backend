@@ -39,34 +39,53 @@ export const adminLogin = async (req: Request, res: Response) => {
 
 export const getAllUsers = async (req: Request, res: Response) => {
     const search = req.query.search?.toString().toLowerCase() || "";
+    const startDate = req.query.startDate as string;
+    const endDate = req.query.endDate as string;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     const offset = (page - 1) * limit;
 
     try {
         const values: any[] = [];
-        let whereClause = "";
+        const conditions: string[] = [];
 
         if (search) {
-            whereClause = `WHERE LOWER(username) LIKE $1 OR LOWER(email) LIKE $1`;
+            conditions.push(`(LOWER(username) LIKE $${values.length + 1} OR LOWER(email) LIKE $${values.length + 1})`);
             values.push(`%${search}%`);
         }
 
-        const countQuery = `SELECT COUNT(*) FROM users ${whereClause}`;
-        const usersQuery = `SELECT id, username, email FROM users ${whereClause} ORDER BY id DESC LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
+        if (startDate) {
+            conditions.push(`created_at >= $${values.length + 1}`);
+            values.push(startDate);
+        }
 
+        if (endDate) {
+            conditions.push(`created_at <= $${values.length + 1}`);
+            values.push(endDate);
+        }
+
+        const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+        const countQuery = `SELECT COUNT(*) FROM users ${whereClause}`;
         const countResult = await pool.query(countQuery, values);
         const totalUsers = parseInt(countResult.rows[0].count);
 
         values.push(limit, offset);
+        const usersQuery = `
+            SELECT id, username, email, created_at
+            FROM users
+            ${whereClause}
+            ORDER BY id DESC
+            LIMIT $${values.length - 1} OFFSET $${values.length}
+        `;
         const usersResult = await pool.query(usersQuery, values);
 
         res.json({
             users: usersResult.rows,
             pagination: {
                 page,
-                totalPages: Math.ceil(totalUsers / limit)
-            }
+                totalPages: Math.ceil(totalUsers / limit),
+            },
         });
     } catch (err) {
         res.status(500).json({ error: "Server error", details: err });

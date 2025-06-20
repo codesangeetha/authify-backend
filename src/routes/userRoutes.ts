@@ -1,12 +1,12 @@
 import express from "express";
-import { getUserProfile, hello, updateUserProfile, uploadProfileImage } from "../controllers/userController";
+import { getUserProfile, testMail, updateUserProfile, uploadProfileImage } from "../controllers/userController";
 import { verifyToken } from "../middleware/authMiddleware";
 import upload from "../middleware/upload";
 
 const router = express.Router();
 
 router.get("/profile", verifyToken, getUserProfile);
-router.get("/hello", hello);
+router.get("/testmail", testMail);
 router.put("/profile", verifyToken, updateUserProfile);
 router.post(
     "/profile/upload",

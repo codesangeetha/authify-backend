@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { findUserProfileById, updateUserProfileById, updateUserProfileImage } from "../models/userModel";
 import path from "path";
+import { sendEmail } from "../helpers/functions";
 
 export const getUserProfile = async (req: Request, res: Response) => {
     if (!req.user) return res.status(401).json({ error: "Unauthorized" });
@@ -56,8 +57,10 @@ export const uploadProfileImage = async (req: Request, res: Response) => {
     }
 };
 
-export const hello = async (req: Request, res: Response) => {
+
+export const testMail = async (req: Request, res: Response) => {
    
+await sendEmail("sangeetharenganath98@gmail.com", "hi sangeetha", "to check mail.");
 
    
         res.json({
